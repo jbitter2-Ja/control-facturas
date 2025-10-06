@@ -367,9 +367,12 @@ function App() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Control de Facturas</h1>
-            <p className="text-gray-600">Sistema de gestión y seguimiento de facturación</p>
+          <div className="flex items-center gap-4">
+            <img src="/logo.jpg" alt="IApatagonia SpA" className="h-16 w-auto" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Control de Facturas</h1>
+              <p className="text-gray-600">IApatagonia SpA</p>
+            </div>
           </div>
           <button
             onClick={handleLogout}
