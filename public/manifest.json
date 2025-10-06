@@ -1,0 +1,22 @@
+{
+  "name": "Control de Facturas - IApatagonia SpA",
+  "short_name": "Facturas",
+  "description": "Sistema de gestión de facturas IApatagonia SpA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
