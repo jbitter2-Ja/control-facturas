@@ -17,7 +17,7 @@ import {
   onSnapshot,
   serverTimestamp 
 } from 'firebase/firestore';
-import { Plus, Search, TrendingUp, DollarSign, AlertCircle, CheckCircle, Clock, X, LogOut, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, TrendingUp, DollarSign, AlertCircle, CheckCircle, Clock, X, LogOut, Trash2, Edit, Download } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function App() {
@@ -176,7 +176,52 @@ function App() {
   const getBalance = (invoice) => {
     return invoice.amount - invoice.paidAmount;
   };
+const exportToExcel = () => {
+    // Preparar datos para exportar
+    const dataToExport = filteredInvoices.map(inv => ({
+      'N° Factura': inv.number,
+      'Fecha Emisión': new Date(inv.issueDate).toLocaleDateString('es-CL'),
+      'Cliente': inv.client,
+      'Descripción': inv.description,
+      'Monto': inv.amount,
+      'Fecha Vencimiento': new Date(inv.dueDate).toLocaleDateString('es-CL'),
+      'Estado': getInvoiceStatus(inv) === 'paid' ? 'Pagada' : 
+                getInvoiceStatus(inv) === 'pending' ? 'Pendiente' :
+                getInvoiceStatus(inv) === 'overdue' ? 'Vencida' : 'Parcial',
+      'Monto Pagado': inv.paidAmount,
+      'Saldo Pendiente': getBalance(inv),
+      'Fecha Pago': inv.paymentDate ? new Date(inv.paymentDate).toLocaleDateString('es-CL') : '',
+      'Método Pago': inv.paymentMethod || '',
+      'Días Vencidos': getOverdueDays(inv) || ''
+    }));
 
+    // Crear CSV
+    const headers = Object.keys(dataToExport[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...dataToExport.map(row => 
+        headers.map(header => {
+          const value = row[header];
+          // Escapar valores con comas
+          if (typeof value === 'string' && value.includes(',')) {
+            return `"${value}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Descargar archivo
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `facturas_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   const kpis = useMemo(() => {
     const today = new Date();
     const currentMonth = today.getMonth();
@@ -500,7 +545,14 @@ function App() {
                 <option value="overdue">Vencidas</option>
                 <option value="partial">Parciales</option>
               </select>
-              
+           <button
+                onClick={exportToExcel}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                title="Exportar a Excel"
+              >
+                <Download size={20} />
+                Exportar
+              </button>   
               <button
                 onClick={() => {
                   setShowForm(!showForm);
